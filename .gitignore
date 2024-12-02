@@ -1,3 +1,6 @@
 .direnv
 
 result
+
+# dont check in puzzle input
+in
