@@ -8,23 +8,21 @@ let
   parseInput = text:
     let
       pairStrs = lib.strings.splitString "\n" text;
-      splitPair = str: builtins.trace str
-        (
-          let
-            split = lib.strings.splitString " " str;
-            asInts = builtins.map lib.strings.toIntBase10 split;
-          in
-          {
-            left = builtins.head asInts;
-            right = builtins.tail asInts;
-          }
-        );
+      splitPair = str:
+        let
+          split = lib.strings.splitString " " str;
+        in
+        {
+          left = lib.strings.toIntBase10 (builtins.head split);
+          right = lib.strings.toIntBase10 (lib.last split); #lib.last is more efficient than tail since tail walks the whole list
+        }
+      ;
 
       pairs = builtins.map splitPair pairStrs;
       left = builtins.map (p: p.left) pairs;
       right = builtins.map (p: p.right) pairs;
 
-      sortLst = lst: lib.lists.sortOn (p: q: p < q) lst;
+      sortLst = lst: (lib.lists.sortOn (p: p) lst);
       sortedLeft = sortLst left;
       sortedRight = sortLst right;
 
