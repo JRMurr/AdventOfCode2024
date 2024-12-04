@@ -7,7 +7,7 @@ let
 
   parseInput = text:
     let
-      pairStrs = lib.strings.splitString "\n" text;
+      pairStrs = lib.strings.splitString "\n" (lib.strings.trim text);
       splitPair = str:
         let
           split = lib.strings.splitString " " str;
