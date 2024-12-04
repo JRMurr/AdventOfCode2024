@@ -5,6 +5,9 @@ let
 
   abs = x: if x < 0 then x * -1 else x;
 
+  sortLst = lst: (lib.lists.sortOn (p: p) lst);
+
+
   parseInput = text:
     let
       pairStrs = lib.strings.splitString "\n" (lib.strings.trim text);
@@ -21,21 +24,40 @@ let
       pairs = builtins.map splitPair pairStrs;
       left = builtins.map (p: p.left) pairs;
       right = builtins.map (p: p.right) pairs;
+    in
+    { inherit left right; };
 
-      sortLst = lst: (lib.lists.sortOn (p: p) lst);
+
+  part0 = text:
+    let
+      lists = parseInput text;
+      inherit (lists) left right;
+
       sortedLeft = sortLst left;
       sortedRight = sortLst right;
 
       combined = lib.zipListsWith (l: r: (abs (l - r))) sortedLeft sortedRight;
-
     in
     lib.lists.foldl' (acc: x: acc + x) 0 combined;
 
 
-  part0 = text: parseInput text;
+
+  part1 = text:
+    let
+      lists = parseInput text;
+      inherit (lists) left right;
+      # should probs groupb 
+      # scoreElem = elem: (lib.lists.count (x: x == elem) right) * elem;
+
+      elemCounts = lib.lists.groupBy' builtins.add 0 (x: "${toString x}") right;
+
+      getCount = x: if builtins.hasAttr "${toString x}" elemCounts then builtins.getAttr "${toString x}" elemCounts else 0;
 
 
-  part1 = text: "TODO";
+      scores = builtins.map getCount left;
+
+    in
+    lib.lists.foldl' (acc: x: acc + x) 0 scores;
 
 
   solve = text: {
