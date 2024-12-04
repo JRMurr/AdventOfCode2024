@@ -14,11 +14,14 @@
       system:
       let
         pkgs = import nixpkgs { inherit system; };
+
+        runDay = pkgs.callPackage ./runDay.nix { };
       in
       {
         devShells = {
           default = pkgs.mkShell {
             buildInputs = with pkgs; [
+              runDay
               # common
               just
             ];
