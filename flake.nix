@@ -22,7 +22,8 @@
           default = pkgs.mkShell {
             buildInputs = with pkgs; [
               runDay
-              # common
+
+              aoc-cli
               just
             ];
           };
