@@ -38,7 +38,7 @@ let
 
       combined = lib.zipListsWith (l: r: (abs (l - r))) sortedLeft sortedRight;
     in
-    lib.lists.foldl' (acc: x: acc + x) 0 combined;
+    lib.lists.foldl' builtins.add 0 combined;
 
 
 
@@ -49,15 +49,14 @@ let
       # should probs groupb 
       # scoreElem = elem: (lib.lists.count (x: x == elem) right) * elem;
 
-      elemCounts = lib.lists.groupBy' builtins.add 0 (x: "${toString x}") right;
+      elemScores = lib.lists.groupBy' builtins.add 0 (x: "${toString x}") right;
 
-      getCount = x: if builtins.hasAttr "${toString x}" elemCounts then builtins.getAttr "${toString x}" elemCounts else 0;
+      getScore = x: if builtins.hasAttr "${toString x}" elemScores then builtins.getAttr "${toString x}" elemScores else 0;
 
-
-      scores = builtins.map getCount left;
+      scores = builtins.map getScore left;
 
     in
-    lib.lists.foldl' (acc: x: acc + x) 0 scores;
+    lib.lists.foldl' builtins.add 0 scores;
 
 
   solve = text: {
