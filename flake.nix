@@ -16,14 +16,15 @@
         pkgs = import nixpkgs { inherit system; };
 
         runDay = pkgs.callPackage ./runDay.nix { };
+        initDay = pkgs.callPackage ./initDay.nix { };
       in
       {
         devShells = {
           default = pkgs.mkShell {
             buildInputs = with pkgs; [
               runDay
+              initDay
 
-              aoc-cli
               just
             ];
           };
