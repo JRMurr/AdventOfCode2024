@@ -18,6 +18,6 @@ let
     };
 in
 {
-  example = solve ./in.example);
+  example = solve ./in.example;
   real = solve ./in;
 }
