@@ -17,7 +17,7 @@ let
         in
         {
           left = lib.strings.toIntBase10 (builtins.head split);
-          right = lib.strings.toIntBase10 (lib.last split); #lib.last is more efficient than tail since tail walks the whole list
+          right = lib.strings.toIntBase10 (lib.last split);
         }
       ;
 
