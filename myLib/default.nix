@@ -25,10 +25,14 @@ let
     addIfNonEmpty { acc = reduced.acc; lst = reduced.currLst; };
 
 
+
   getOrDefault = { key, default, attrs }:
     if builtins.hasAttr key attrs then builtins.getAttr key attrs else default;
 
+
+  sumList = lst: lib.lists.foldl' builtins.add 0 lst;
+
 in
 {
-  inherit splitEmptyLine getOrDefault;
+  inherit splitEmptyLine getOrDefault sumList;
 }
