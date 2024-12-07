@@ -17,21 +17,23 @@ let
       lst = lib.flatten rows;
     };
 
-  # a % b
+  /**
+    a % b
+  */
   modulo = a: b: a - b * builtins.floor (a / b);
 
 
-  # A ray is an attrset with
-  # {
-  #  offsets =  <offset idxs>;
-  #  allowed = idx => boolean. Returns true if the full ray can be cast starting at that idx;
-  # };
-
+  /** 
+    A ray is an attrset with
+    {
+     offsets =  <offset idxs>;
+     allowed = idx => boolean. Returns true if the full ray can be cast starting at that idx;
+    };
+  */
   getRays = { width, height }:
     let
       getCol = idx: modulo idx width;
       getRow = idx: idx / width;
-      # TODO: probably an off by one in these checks....
       horizontal = {
         offsets = builtins.genList (i: i) 4;
         allowed = idx: (getCol idx) <= width - 4;
@@ -89,19 +91,60 @@ let
         ))
         lst;
 
-      # checkIdx = idx: value:
-      #   let
-
-      #   in false;
-
-      # numMatches = lib.lists.ifilter0 checkIdx lst;
-
       numMatches = lib.lists.foldl' builtins.add 0 numHitsAtIdx;
     in
     numMatches;
-  # lib.debug.traceSeq { tmp = rays.diagSW; } numMatches;
 
-  part1 = { text, filePath }: "TODO P2";
+
+  coordToIndex = { x, y, width }:
+    x + (y * width);
+
+
+
+
+  part1 = { text, filePath }:
+    let
+      parsed = parseToList text;
+      inherit (parsed) width lst height;
+
+      xVals = lib.lists.range 1 (width - 2);
+      yVals = lib.lists.range 1 (height - 2);
+
+
+      coordsToCheck = lib.cartesianProduct { x = xVals; y = yVals; };
+      idxsToCheck = builtins.map ({ x, y }: coordToIndex { inherit x y width; }) coordsToCheck;
+
+      AIdxs = builtins.filter (idx: builtins.elemAt lst idx == "A") idxsToCheck;
+
+
+      NWSECorners = [
+        (-width - 1)
+        (width + 1)
+      ];
+      NESWCorners = [
+        (-width + 1)
+        (width - 1)
+      ];
+
+      cornerPairs = [ NWSECorners NESWCorners ];
+
+      validPairs = [ [ "M" "S" ] [ "S" "M" ] ];
+
+
+      # assumes idx is not on the edge of the input and is an A
+      isXmas = idx:
+        let
+          evalOffset = offsets: builtins.map (x: builtins.elemAt lst (x + idx)) offsets;
+
+          cornerIsValid = cornerOffset:
+            let
+              evaled = evalOffset cornerOffset;
+            in
+            builtins.elem evaled validPairs;
+        in
+        builtins.all cornerIsValid cornerPairs;
+    in
+    lib.lists.count isXmas AIdxs;
 
   solve = filePath:
     let
