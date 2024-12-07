@@ -3,6 +3,8 @@ let
 
   lib = pkgs.lib;
 
+  myLib = import ../myLib { inherit pkgs; };
+
   part0 = { text, filePath }: "TODO P1";
 
   part1 = { text, filePath }: "TODO P2";
