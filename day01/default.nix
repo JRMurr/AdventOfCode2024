@@ -1,4 +1,6 @@
-{ pkgs ? import ../locked.nix }:
+{
+  pkgs ? import ../locked.nix,
+}:
 let
 
   lib = pkgs.lib;
@@ -7,28 +9,30 @@ let
 
   sortLst = lst: (lib.lists.sortOn (p: p) lst);
 
-
-  parseInput = text:
+  parseInput =
+    text:
     let
       pairStrs = lib.strings.splitString "\n" (lib.strings.trim text);
-      splitPair = str:
+      splitPair =
+        str:
         let
           split = lib.strings.splitString " " str;
         in
         {
           left = lib.strings.toIntBase10 (builtins.head split);
           right = lib.strings.toIntBase10 (lib.last split);
-        }
-      ;
+        };
 
       pairs = builtins.map splitPair pairStrs;
       left = builtins.map (p: p.left) pairs;
       right = builtins.map (p: p.right) pairs;
     in
-    { inherit left right; };
+    {
+      inherit left right;
+    };
 
-
-  part0 = text:
+  part0 =
+    text:
     let
       lists = parseInput text;
       inherit (lists) left right;
@@ -40,24 +44,27 @@ let
     in
     lib.lists.foldl' builtins.add 0 combined;
 
-
-
-  part1 = text:
+  part1 =
+    text:
     let
       lists = parseInput text;
       inherit (lists) left right;
-      # should probs groupb 
+      # should probs groupb
       # scoreElem = elem: (lib.lists.count (x: x == elem) right) * elem;
 
       elemScores = lib.lists.groupBy' builtins.add 0 (x: "${toString x}") right;
 
-      getScore = x: if builtins.hasAttr "${toString x}" elemScores then builtins.getAttr "${toString x}" elemScores else 0;
+      getScore =
+        x:
+        if builtins.hasAttr "${toString x}" elemScores then
+          builtins.getAttr "${toString x}" elemScores
+        else
+          0;
 
       scores = builtins.map getScore left;
 
     in
     lib.lists.foldl' builtins.add 0 scores;
-
 
   solve = text: {
     "0" = part0 text;

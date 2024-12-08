@@ -1,4 +1,6 @@
-{ pkgs ? import ../locked.nix }:
+{
+  pkgs ? import ../locked.nix,
+}:
 let
 
   lib = pkgs.lib;
@@ -9,7 +11,8 @@ let
 
   part1 = { text, filePath }: "TODO P2";
 
-  solve = filePath:
+  solve =
+    filePath:
     let
       text = builtins.readFile filePath;
       attrs = { inherit text filePath; };

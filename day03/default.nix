@@ -1,9 +1,12 @@
-{ pkgs ? import ../locked.nix }:
+{
+  pkgs ? import ../locked.nix,
+}:
 let
 
   lib = pkgs.lib;
 
-  callRg = filePath:
+  callRg =
+    filePath:
     let
       rgPath = "${pkgs.ripgrep}/bin/rg";
     in
@@ -11,8 +14,8 @@ let
       ${rgPath} --only-matching --no-line-number "mul\((\d{1,3}),(\d{1,3})\)" ${filePath} > $out 
     '';
 
-
-  doMul = mulStr:
+  doMul =
+    mulStr:
     lib.trivial.pipe mulStr [
       # clean the string to remove the non-digit chars
       (lib.strings.removePrefix "mul(")
@@ -26,7 +29,8 @@ let
       (lib.lists.foldl' (x: y: x * y) 1)
     ];
 
-  part0 = { text, filePath }:
+  part0 =
+    { text, filePath }:
     let
       matches = builtins.readFile (callRg filePath);
       matchLines = (lib.strings.splitString "\n" (lib.strings.trim matches));
@@ -34,8 +38,8 @@ let
     in
     (lib.lists.foldl' builtins.add 0 muls);
 
-
-  callRgP2 = filePath:
+  callRgP2 =
+    filePath:
     let
       rgPath = "${pkgs.ripgrep}/bin/rg";
     in
@@ -43,26 +47,43 @@ let
       ${rgPath} --only-matching --no-line-number "(mul\((\d{1,3}),(\d{1,3})\))|(do\(\))|(don't\(\))" ${filePath} > $out 
     '';
 
-  part1 = { text, filePath }:
+  part1 =
+    { text, filePath }:
     let
       matches = builtins.readFile (callRgP2 filePath);
       matchLines = (lib.strings.splitString "\n" (lib.strings.trim matches));
 
-      trimFn = { lst, addAllowed }: x:
+      trimFn =
+        { lst, addAllowed }:
+        x:
         let
           command = builtins.head (lib.strings.splitString "(" x);
-          addAllowed' = if command == "do" then true else if command == "don't" then false else addAllowed;
+          addAllowed' =
+            if command == "do" then
+              true
+            else if command == "don't" then
+              false
+            else
+              addAllowed;
           lst' = if command == "mul" && addAllowed then (lst ++ [ x ]) else lst;
         in
-        { lst = lst'; addAllowed = addAllowed'; };
+        {
+          lst = lst';
+          addAllowed = addAllowed';
+        };
 
-      trimmedMuls = (lib.lists.foldl' trimFn { lst = [ ]; addAllowed = true; } matchLines).lst;
+      trimmedMuls =
+        (lib.lists.foldl' trimFn {
+          lst = [ ];
+          addAllowed = true;
+        } matchLines).lst;
 
       muls = builtins.map doMul trimmedMuls;
     in
     (lib.lists.foldl' builtins.add 0 muls);
 
-  solve = filePath:
+  solve =
+    filePath:
     let
       text = builtins.readFile filePath;
       attrs = { inherit text filePath; };

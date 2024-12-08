@@ -1,13 +1,16 @@
-{ writeShellApplication
+{
+  writeShellApplication,
 
-, git
-, aoc-cli
-,
+  git,
+  aoc-cli,
 }:
 
 writeShellApplication {
   name = "init-day";
-  runtimeInputs = [ git aoc-cli ];
+  runtimeInputs = [
+    git
+    aoc-cli
+  ];
   text = ''
     REPO_ROOT=$(git rev-parse --show-toplevel)
     cd "$REPO_ROOT"

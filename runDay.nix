@@ -1,7 +1,7 @@
-{ writeShellApplication
-, nix
-, git
-,
+{
+  writeShellApplication,
+  nix,
+  git,
 }:
 
 let
@@ -82,20 +82,22 @@ let
 in
 writeShellApplication {
   name = "run-day";
-  runtimeInputs = [ nix git ];
+  runtimeInputs = [
+    nix
+    git
+  ];
   #     nix eval --impure --expr 'let day = import ./day{{day}}/default.nix {}; in day.example."0"' "$@"
 
-  text =
-    ''
-      ${parseArgs}
-      mode="real"
-      if [[ "$useExample" == "true" ]]; then
-        mode="example"
-      fi
+  text = ''
+    ${parseArgs}
+    mode="real"
+    if [[ "$useExample" == "true" ]]; then
+      mode="example"
+    fi
 
-      REPO_ROOT=$(git rev-parse --show-toplevel)
-      cd "$REPO_ROOT"
-    
-      nix eval --impure --expr "let day = import ./day''${day}/default.nix {}; in day.''${mode}.\"''${part}\"" "''${POSITIONAL[@]}"
-    '';
+    REPO_ROOT=$(git rev-parse --show-toplevel)
+    cd "$REPO_ROOT"
+
+    nix eval --impure --expr "let day = import ./day''${day}/default.nix {}; in day.''${mode}.\"''${part}\"" "''${POSITIONAL[@]}"
+  '';
 }
