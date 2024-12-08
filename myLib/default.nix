@@ -3,6 +3,8 @@ let
 
   lib = pkgs.lib;
 
+  modulo = a: b: a - b * builtins.floor (a / b);
+
   splitEmptyLine = text:
     let
       lines = (lib.strings.splitString "\n" (lib.strings.trim text));
@@ -32,7 +34,11 @@ let
 
   sumList = lst: lib.lists.foldl' builtins.add 0 lst;
 
+
+
 in
 {
-  inherit splitEmptyLine getOrDefault sumList;
+  inherit splitEmptyLine getOrDefault sumList modulo;
+
+  grid = import ./grid.nix { inherit pkgs; };
 }
