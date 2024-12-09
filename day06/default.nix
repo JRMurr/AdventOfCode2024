@@ -55,7 +55,7 @@ let
           {
             filter = coord: coord.y == guardLoc.y && coord.x < guardLoc.x;
             newDir = directions.north;
-            distToEdge = guardLoc.x;
+            distToEdge = guardLoc.x + 1;
             minimizer = coord: -1 * coord.x;
             guardEnd = obsCoord: gridLib.movementFuncs.east obsCoord;
             cellsCovered =
@@ -69,7 +69,7 @@ let
           {
             filter = coord: coord.x == guardLoc.x && coord.y < guardLoc.y;
             newDir = directions.east;
-            distToEdge = guardLoc.y;
+            distToEdge = guardLoc.y + 1;
             minimizer = coord: -1 * coord.y;
             guardEnd = obsCoord: gridLib.movementFuncs.south obsCoord;
             cellsCovered =
@@ -206,23 +206,24 @@ let
       obstructionLocations = builtins.getAttr obstruction cellTypes;
       guardStart = builtins.head (builtins.getAttr "^" cellTypes);
 
-      # cellsSeen = coveredCells {
-      #   inherit grid;
-      #   guardLoc = guardStart;
-      #   obstructionLocations = obstructionLocations;
-      #   dir = directions.north;
-      # };
-
-      cellsSeen = walk {
+      cellsSeen = coveredCells {
         inherit grid;
         guardLoc = guardStart;
         obstructionLocations = obstructionLocations;
         dir = directions.north;
       };
 
+      # cellsSeen = walk {
+      #   inherit grid;
+      #   guardLoc = guardStart;
+      #   obstructionLocations = obstructionLocations;
+      #   dir = directions.north;
+      # };
+
       numSeen = builtins.length (lib.lists.unique cellsSeen);
 
     in
+    # lib.debug.traceSeq (cellsSeen)
     numSeen;
 
   part1 = { text, filePath }: "TODO P2";
