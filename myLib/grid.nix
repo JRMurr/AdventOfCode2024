@@ -159,28 +159,28 @@ let
         x = x - 1;
       };
 
-    NorthEast =
+    northEast =
       { x, y }:
       {
         y = y - 1;
         x = x + 1;
       };
 
-    NorthWest =
+    northWest =
       { x, y }:
       {
         y = y - 1;
         x = x - 1;
       };
 
-    SouthEast =
+    southEast =
       { x, y }:
       {
         y = y + 1;
         x = x + 1;
       };
 
-    SouthWest =
+    southWest =
       { x, y }:
       {
         y = y + 1;
@@ -199,6 +199,19 @@ let
     southEast = 6;
     southWest = 7;
   };
+
+  movementForDir =
+    dir:
+    if dir == directions.east then
+      movementFuncs.east
+    else if dir == directions.west then
+      movementFuncs.west
+    else if dir == directions.north then
+      movementFuncs.north
+    else if dir == directions.south then
+      movementFuncs.south
+    else
+      throw "unhandled dir ${toString dir}";
 
   # manhattan distance between two coords
   coordDist =
@@ -225,5 +238,6 @@ in
     movementFuncs
     directions
     coordDist
+    movementForDir
     ;
 }
