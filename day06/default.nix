@@ -144,54 +144,6 @@ let
         }
     );
 
-  rightTurn =
-    dir:
-    if dir == directions.east then
-      directions.south
-    else if dir == directions.west then
-      directions.north
-    else if dir == directions.north then
-      directions.east
-    else if dir == directions.south then
-      directions.west
-    else
-      throw "unhandled dir ${toString dir}";
-
-  walk =
-    {
-      grid, # grid<T>
-      guardLoc, # {x,y}
-      obstructionLocations, # list<{x,y}>
-      dir, # gridLib.direction
-    }:
-    let
-      # cellValueUnchecked = gridLib.getCoordSafe ({ inherit grid; } // guardLoc);
-      # outOfBounds = builtins.hasAttr "error" cellValueUnchecked;
-
-      # cellValue = cellValueUnchecked.result;
-
-      outOfBounds = !(gridLib.isValidCoord ({ inherit grid; } // guardLoc));
-
-      newGuardLoc = (gridLib.movementForDir dir) guardLoc;
-
-      touchingObs = builtins.elem newGuardLoc obstructionLocations;
-    in
-    if outOfBounds then
-      [ ]
-    else if touchingObs then
-      walk {
-        inherit grid guardLoc obstructionLocations;
-        dir = rightTurn dir;
-      }
-    else
-      (
-        [ guardLoc ]
-        ++ (walk {
-          inherit grid dir obstructionLocations;
-          guardLoc = newGuardLoc;
-        })
-      );
-
   part0 =
     { text, filePath }:
     let
@@ -219,13 +171,6 @@ let
         obstructionLocations = obstructionLocations;
         dir = directions.north;
       };
-
-      # cellsSeen = walk {
-      #   inherit grid;
-      #   guardLoc = guardStart;
-      #   obstructionLocations = obstructionLocations;
-      #   dir = directions.north;
-      # };
 
       numSeen = builtins.length (lib.lists.unique cellsSeen);
 
