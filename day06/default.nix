@@ -11,8 +11,6 @@ let
 
   directions = gridLib.directions;
 
-  obstruction = "#";
-
   minBy =
     minFn: lst:
     let
@@ -162,7 +160,7 @@ let
         ]
       ) [ ] (elem: elem.value) cellsWithCoord;
 
-      obstructionLocations = builtins.getAttr obstruction cellTypes;
+      obstructionLocations = builtins.getAttr "#" cellTypes;
       guardStart = builtins.head (builtins.getAttr "^" cellTypes);
 
       cellsSeen = coveredCells {
@@ -219,7 +217,7 @@ let
         ]
       ) [ ] (elem: elem.value) cellsWithCoord;
 
-      obstructionLocations = builtins.getAttr obstruction cellTypes;
+      obstructionLocations = builtins.getAttr "#" cellTypes;
       guardStart = builtins.head (builtins.getAttr "^" cellTypes);
 
       guardPath = lib.lists.unique (coveredCells {
