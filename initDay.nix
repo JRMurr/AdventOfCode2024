@@ -28,12 +28,10 @@ writeShellApplication {
     day_dir="day$day"
 
     # Check if the directory already exists
-    if [ -d "$day_dir" ]; then
-      echo "Directory '$day_dir' already exists. Exiting."
-      exit 1
+    if [ ! -d "$day_dir" ]; then
+      echo "Directory '$day_dir' does not exist. Copying template."
+      cp -r _template "$day_dir"
     fi
-
-    cp -r _template "$day_dir"
 
     aoc download -o --day "$day" \
         --input-file ./"$day_dir"/in \

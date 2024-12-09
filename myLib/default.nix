@@ -5,6 +5,8 @@ let
 
   lib = pkgs.lib;
 
+  abs = x: if x < 0 then x * -1 else x;
+
   modulo = a: b: a - b * builtins.floor (a / b);
 
   splitEmptyLine =
@@ -55,6 +57,7 @@ let
 in
 {
   inherit
+    abs
     splitEmptyLine
     getOrDefault
     sumList
