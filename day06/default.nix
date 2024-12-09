@@ -27,15 +27,19 @@ let
     in
     builtins.foldl' reduceFn null lst;
 
-  # this has an off by 1.........
   findNextObstruction =
     {
       grid, # grid<T>
       guardLoc, # {x,y}
       obstructionLocations, # list<{x,y}>
       dir, # gridLib.direction
+      seen ? { },
     }:
     let
+      seenKey = "${toString guardLoc.x}-${toString guardLoc.y}-${toString dir}";
+
+      looped = builtins.hasAttr seenKey seen;
+
       obstructionSelector =
         if dir == directions.east then
           {
@@ -111,8 +115,11 @@ let
 
     in
     {
-      inherit guardEndCoord cellsTouched;
+      inherit guardEndCoord cellsTouched looped;
       newDir = obstructionSelector.newDir;
+      seen = seen // {
+        "${seenKey}" = true;
+      };
     };
 
   coveredCells =
@@ -226,7 +233,70 @@ let
     # lib.debug.traceSeq (cellsSeen)
     numSeen;
 
-  part1 = { text, filePath }: "TODO P2";
+  hasLoop =
+    {
+      grid, # grid<T>
+      guardLoc, # {x,y}
+      obstructionLocations, # list<{x,y}>
+      dir, # gridLib.direction
+    }@args:
+    let
+      obstructionInfo = findNextObstruction args;
+    in
+    if obstructionInfo.looped then
+      true
+    else if obstructionInfo.guardEndCoord == null then
+      false
+    else
+      hasLoop {
+        inherit grid obstructionLocations;
+        guardLoc = obstructionInfo.guardEndCoord;
+        dir = obstructionInfo.newDir;
+      };
+
+  part1 =
+    { text, filePath }:
+    let
+      grid = gridLib.parse2dGrid (lib.strings.trim text);
+
+      cellsWithCoord = gridLib.asList grid;
+      # group by cell type to get all obstructions
+      cellTypes = lib.lists.groupBy' (
+        lst: elem:
+        lst
+        ++ [
+          {
+            x = elem.x;
+            y = elem.y;
+          }
+        ]
+      ) [ ] (elem: elem.value) cellsWithCoord;
+
+      obstructionLocations = builtins.getAttr obstruction cellTypes;
+      guardStart = builtins.head (builtins.getAttr "^" cellTypes);
+
+      guardPath = lib.lists.unique (coveredCells {
+        inherit grid;
+        guardLoc = guardStart;
+        obstructionLocations = obstructionLocations;
+        dir = directions.north;
+      });
+
+      guardPathNoStart = builtins.filter (x: x != guardStart) guardPath;
+
+      updatedObstructions = builtins.map (x: obstructionLocations ++ [ x ]) guardPathNoStart;
+
+      numLooped = lib.lists.count (
+        obstructions:
+        hasLoop {
+          inherit grid;
+          guardLoc = guardStart;
+          obstructionLocations = obstructions;
+          dir = directions.north;
+        }
+      ) updatedObstructions;
+    in
+    numLooped;
 
   solve =
     filePath:

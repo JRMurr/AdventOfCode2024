@@ -98,6 +98,6 @@ writeShellApplication {
     REPO_ROOT=$(git rev-parse --show-toplevel)
     cd "$REPO_ROOT"
 
-    nix eval --impure --expr "let day = import ./day''${day}/default.nix {}; in day.''${mode}.\"''${part}\"" "''${POSITIONAL[@]}"
+    nix eval --impure --option max-call-depth 10000 --expr "let day = import ./day''${day}/default.nix {}; in day.''${mode}.\"''${part}\"" "''${POSITIONAL[@]}"
   '';
 }
