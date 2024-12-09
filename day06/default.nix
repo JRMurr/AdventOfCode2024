@@ -239,6 +239,7 @@ let
       guardLoc, # {x,y}
       obstructionLocations, # list<{x,y}>
       dir, # gridLib.direction
+      seen ? { },
     }@args:
     let
       obstructionInfo = findNextObstruction args;
@@ -252,6 +253,7 @@ let
         inherit grid obstructionLocations;
         guardLoc = obstructionInfo.guardEndCoord;
         dir = obstructionInfo.newDir;
+        seen = obstructionInfo.seen;
       };
 
   part1 =
