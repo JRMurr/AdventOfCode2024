@@ -32,14 +32,17 @@ let
     { opLst, vals }:
     let
       partialApplied = lib.zipListsWith (val: op: op val) (builtins.tail vals) opLst;
+      res = builtins.foldl' (acc: op: op acc) (builtins.head vals) partialApplied;
+
     in
-    builtins.foldl' (acc: op: op acc) (builtins.head vals) partialApplied;
+    res;
 
   checkEq =
+    validOps:
     { left, right }:
     let
       numOps = (builtins.length right) - 1;
-      opsToTry = myLib.permutations [ builtins.add builtins.mul ] numOps;
+      opsToTry = myLib.permutations validOps numOps;
       tryOpLst =
         opLst:
         (evalOps {
@@ -53,13 +56,40 @@ let
     { text, filePath }:
     let
       eqs = myLib.parseLines parseEquation text;
-      validEqs = builtins.filter checkEq eqs;
+      checkFn = checkEq [
+        builtins.add
+        builtins.mul
+      ];
+      validEqs = builtins.filter checkFn eqs;
+      res = myLib.sumList (builtins.map (eq: eq.left) validEqs);
+    in
+    res;
+
+  concatDigits =
+    a: b:
+    let
+      concatStrs = lib.strings.concatMapStrings (x: toString x) [
+        # flipping order since we apply on the right in the eval fn
+        b
+        a
+      ];
+    in
+    lib.strings.toIntBase10 concatStrs;
+
+  part1 =
+    { text, filePath }:
+    let
+      eqs = myLib.parseLines parseEquation text;
+      checkFn = checkEq [
+        builtins.add
+        builtins.mul
+        concatDigits
+      ];
+      validEqs = builtins.filter checkFn eqs;
       res = myLib.sumList (builtins.map (eq: eq.left) validEqs);
     in
     # lib.debug.traceSeq validEqs
-    res;
-
-  part1 = { text, filePath }: "TODO P2";
+    res; # took 2ish min on real input
 
   solve =
     filePath:
