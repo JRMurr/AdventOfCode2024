@@ -9,6 +9,13 @@ let
 
   modulo = a: b: a - b * builtins.floor (a / b);
 
+  parseLines =
+    lineFn: text:
+    let
+      lines = lib.strings.splitString "\n" (lib.strings.trim text);
+    in
+    builtins.map lineFn lines;
+
   splitEmptyLine =
     text:
     let
@@ -59,6 +66,7 @@ in
   inherit
     abs
     splitEmptyLine
+    parseLines
     getOrDefault
     sumList
     modulo
