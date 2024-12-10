@@ -28,12 +28,36 @@ let
       inherit left right;
     };
 
+  evalOps =
+    { opLst, vals }:
+    let
+      partialApplied = lib.zipListsWith (val: op: op val) (builtins.tail vals) opLst;
+    in
+    builtins.foldl' (acc: op: op acc) (builtins.head vals) partialApplied;
+
+  checkEq =
+    { left, right }:
+    let
+      numOps = (builtins.length right) - 1;
+      opsToTry = myLib.permutations [ builtins.add builtins.mul ] numOps;
+      tryOpLst =
+        opLst:
+        (evalOps {
+          inherit opLst;
+          vals = right;
+        }) == left;
+    in
+    builtins.any tryOpLst opsToTry;
+
   part0 =
     { text, filePath }:
     let
       eqs = myLib.parseLines parseEquation text;
+      validEqs = builtins.filter checkEq eqs;
+      res = myLib.sumList (builtins.map (eq: eq.left) validEqs);
     in
-    "TODO P1";
+    # lib.debug.traceSeq validEqs
+    res;
 
   part1 = { text, filePath }: "TODO P2";
 

@@ -61,6 +61,18 @@ let
 
   sumList = lst: lib.lists.foldl' builtins.add 0 lst;
 
+  # ggenerates all permutations of length n from a list of values
+  permutations =
+    values: n:
+    if n == 0 then
+      [ [ ] ] # Base case: a list containing an empty list
+    else
+      let
+        # Recursive step: prepend each value from `values` to all permutations of length n-1
+        smallerPermutations = permutations values (n - 1);
+      in
+      builtins.concatMap (p: map (v: ([ v ] ++ p)) values) smallerPermutations;
+
 in
 {
   inherit
@@ -70,6 +82,7 @@ in
     getOrDefault
     sumList
     modulo
+    permutations
     ;
 
   grid = import ./grid.nix { inherit pkgs; };
