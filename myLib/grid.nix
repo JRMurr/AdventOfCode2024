@@ -222,6 +222,27 @@ let
     in
     xDiff + yDiff;
 
+  coordDiff =
+    c1: c2:
+    let
+      xDiff = c1.x - c2.x;
+      yDiff = c1.y - c2.y;
+    in
+    {
+      x = xDiff;
+      y = yDiff;
+    };
+
+  addCoord = c1: c2: {
+    x = c1.x + c2.x;
+    y = c1.y + c2.y;
+  };
+
+  invertRay = vec: {
+    x = vec.x * -1;
+    y = vec.y * -1;
+  };
+
 in
 {
   inherit
@@ -239,5 +260,8 @@ in
     directions
     coordDist
     movementForDir
+    invertRay
+    addCoord
+    coordDiff
     ;
 }
